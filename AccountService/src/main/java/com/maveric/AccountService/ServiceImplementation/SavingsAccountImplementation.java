@@ -1,6 +1,7 @@
 package com.maveric.AccountService.ServiceImplementation;
 
 import com.maveric.AccountService.AccountServiceApplication;
+import com.maveric.AccountService.RandomGeneratorUtils;
 import com.maveric.AccountService.entity.CurrentAccount;
 import com.maveric.AccountService.entity.SavingsAccount;
 import com.maveric.AccountService.exception.AccountIdNotFoundException;
@@ -21,10 +22,10 @@ public class SavingsAccountImplementation implements SavingsAccountService {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @Override
     public SavingsAccountDto createSavingsAccount(SavingsAccountDto savingsAccountDto) {
         SavingsAccount savingsAccount = modelMapper.map(savingsAccountDto, SavingsAccount.class);
+        savingsAccount.setAccountnumber(RandomGeneratorUtils.generateAccountNumber());
         savingsAccount = savingsRepository.save(savingsAccount);
         return modelMapper.map(savingsAccount, SavingsAccountDto.class);
     }
@@ -36,52 +37,42 @@ public class SavingsAccountImplementation implements SavingsAccountService {
     }
 
     @Override
-    public Optional<SavingsAccount> findAccountById(long id) {
+    public Optional<SavingsAccount> findAccountById(long id) throws AccountIdNotFoundException {
 
-        return savingsRepository.findById(id);
-
+        Optional<SavingsAccount> savingsAccount=savingsRepository.findById(id);
+        if(savingsAccount.isEmpty())
+        {
+           throw new AccountIdNotFoundException("Account id Not found: "+id);
+        }
+        return savingsAccount;
     }
 
-//
-//@Override
-//public Optional<SavingsAccount> updateSavingsAccount(long id, SavingsAccount savingsAccount) {
-//    Optional<SavingsAccount> savingsAccountOptional = savingsRepository.findById(id);
-//
-//    if (savingsAccountOptional == null) {
-//        throw new AccountIdNotFoundException("Account Id Not found");
-//    } else {
-//        SavingsAccount savingsAccount1 = savingsAccountOptional.get();
-//        savingsAccount1.setAccountnumber(savingsAccount.getAccountnumber());
-//        savingsAccount1.setBalance(savingsAccount.getBalance());
-//        return Optional.of(savingsRepository.save(savingsAccount));
-//
-//
-//    }
-//}
-
     @Override
-    public Optional<SavingsAccount> updateSavingsAccount(long id, SavingsAccount savingsAccount) {
-        Optional<SavingsAccount> savingsAccountOptional = savingsRepository.findById(id);
+    public Optional<SavingsAccount> updateSavingsAccount(long id, SavingsAccount savingsAccount) throws AccountIdNotFoundException {
+        Optional<SavingsAccount> savingsAccountOptional = (savingsRepository.findById(id));
+        if (!savingsAccountOptional.isPresent()) {
+
+        throw new AccountIdNotFoundException("Account id Not found :  "+id);
+        } else {
+
         SavingsAccount savingsAccount1 = savingsAccountOptional.get();
-        savingsAccount1.setAccountnumber(savingsAccount.getAccountnumber());
+        //savingsAccount1.setAccountnumber(savingsAccount.getAccountnumber());
         savingsAccount1.setBalance(savingsAccount.getBalance());
         return Optional.of(savingsRepository.save(savingsAccount1));
 
-
     }
 
-
-
-
-
-
-    @Override
-    public SavingsAccountDto deleteCustomer(Long id) {
-        Optional<SavingsAccount> savingsAccount = savingsRepository.findById(id);
-        if (savingsAccount.isPresent())
-            savingsRepository.delete(savingsAccount.get());
-        return modelMapper.map(savingsAccount, SavingsAccountDto.class);
-    }
+}
+        @Override
+        public SavingsAccountDto deleteCustomer(Long id) throws AccountIdNotFoundException {
+            Optional<SavingsAccount> savingsAccount = savingsRepository.findById(id);
+            if (!savingsAccount.isPresent()) {
+                throw new AccountIdNotFoundException("Account id Not found :  " + id);
+            } else {
+                savingsRepository.delete(savingsAccount.get());
+                return modelMapper.map(savingsAccount, SavingsAccountDto.class);
+            }
+        }
 
 
 }

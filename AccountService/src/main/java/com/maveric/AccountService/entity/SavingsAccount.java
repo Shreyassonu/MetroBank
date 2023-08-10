@@ -12,11 +12,10 @@ import lombok.NoArgsConstructor;
 @Entity
 public class SavingsAccount {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @Column(nullable = false)
     private float balance;
-
-    @Column(length = 11,nullable = false)
-    private long accountnumber;
+    private String accountnumber;
 }

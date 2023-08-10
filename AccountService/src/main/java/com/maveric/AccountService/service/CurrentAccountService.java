@@ -2,6 +2,7 @@ package com.maveric.AccountService.service;
 
 import com.maveric.AccountService.entity.CurrentAccount;
 import com.maveric.AccountService.entity.SavingsAccount;
+import com.maveric.AccountService.exception.AccountIdNotFoundException;
 import com.maveric.AccountService.payload.CurrentAccountDto;
 import com.maveric.AccountService.payload.SavingsAccountDto;
 
@@ -13,11 +14,11 @@ public interface CurrentAccountService {
 
     public List<CurrentAccount> getAllAccounts();
 
-    public Optional<CurrentAccount> findAccountById(long id);
+    public Optional<CurrentAccount> findAccountById(long id) throws AccountIdNotFoundException;
 
 
-    public Optional<CurrentAccount> updateCurrentAccount(long id, CurrentAccount currentAccount);
+    public Optional<CurrentAccount> updateCurrentAccount(long id, CurrentAccount currentAccount) throws AccountIdNotFoundException;
 
-    CurrentAccountDto deleteCustomer(Long id);
+    CurrentAccountDto deleteCustomer(Long id) throws AccountIdNotFoundException;
 
 }
